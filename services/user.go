@@ -104,7 +104,7 @@ func (*UserService) AddUserStreamBoth(stream pb.UserService_AddUserStreamBothSer
 		}
 
 		err = stream.Send(&pb.UserResultStream{
-			Status: "Usuario adicionado",
+			Status: "adicionado",
 			User:   request,
 		})
 
