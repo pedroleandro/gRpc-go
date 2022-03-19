@@ -1,6 +1,8 @@
 package main
 
 import (
+	"gRpc-go/pb"
+	"gRpc-go/services"
 	"google.golang.org/grpc"
 	"log"
 	"net"
@@ -14,6 +16,7 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer()
+	pb.RegisterUserServiceServer(grpcServer, services.NewUserService())
 
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("Nao foi possivel encontrar o servidor: %v", err)
