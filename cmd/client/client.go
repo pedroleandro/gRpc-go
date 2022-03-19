@@ -7,6 +7,7 @@ import (
 	"google.golang.org/grpc"
 	"io"
 	"log"
+	"time"
 )
 
 func main() {
@@ -20,7 +21,8 @@ func main() {
 
 	client := pb.NewUserServiceClient(connection)
 
-	AddUserVerbose(client)
+	AddUsers(client)
+	//AddUserVerbose(client)
 	//AddUser(client)
 }
 
@@ -65,4 +67,58 @@ func AddUserVerbose(client pb.UserServiceClient) {
 
 		fmt.Println("Status: ", stream.Status)
 	}
+}
+
+func AddUsers(client pb.UserServiceClient) {
+	request := []*pb.User{
+		&pb.User{
+			Id:    "1",
+			Name:  "Pedro Leandro",
+			Email: "pedro.leandrog@gmail.com",
+		},
+
+		&pb.User{
+			Id:    "2",
+			Name:  "Tiago Pereira",
+			Email: "tiago.pereira@gmail.com",
+		},
+
+		&pb.User{
+			Id:    "3",
+			Name:  "Thiago da Cruz",
+			Email: "thiago.cruz@gmail.com",
+		},
+
+		&pb.User{
+			Id:    "4",
+			Name:  "Gerson James",
+			Email: "gerson.james@gmail.com",
+		},
+
+		&pb.User{
+			Id:    "5",
+			Name:  "Airton Sousa",
+			Email: "airton.sousa@gmail.com",
+		},
+	}
+
+	stream, err := client.AddUsers(context.Background())
+
+	if err != nil {
+		log.Fatalf("Erro ao enviar requisicao: %v", err)
+	}
+
+	for _, req := range request {
+		fmt.Println("Enviando requisicao...")
+		stream.Send(req)
+		time.Sleep(time.Second * 2)
+	}
+
+	response, err := stream.CloseAndRecv()
+	if err != nil {
+		log.Fatalf("Erro ao receber dados: %v", err)
+	}
+
+	fmt.Println(response)
+
 }
