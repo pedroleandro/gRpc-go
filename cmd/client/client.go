@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gRpc-go/pb"
 	"google.golang.org/grpc"
+	"io"
 	"log"
 )
 
@@ -19,7 +20,8 @@ func main() {
 
 	client := pb.NewUserServiceClient(connection)
 
-	AddUser(client)
+	AddUserVerbose(client)
+	//AddUser(client)
 }
 
 func AddUser(client pb.UserServiceClient) {
@@ -36,4 +38,31 @@ func AddUser(client pb.UserServiceClient) {
 	}
 
 	fmt.Println(response)
+}
+
+func AddUserVerbose(client pb.UserServiceClient) {
+	request := &pb.User{
+		Id:    "1",
+		Name:  "Pedro Leandro",
+		Email: "pedro.leandrog@gmail.com",
+	}
+
+	responseStream, err := client.AddUserVerbose(context.Background(), request)
+
+	if err != nil {
+		log.Fatalf("Nao foi possivel realizar a requisicao grpc: %v", err)
+	}
+
+	for {
+		stream, err := responseStream.Recv()
+		if err == io.EOF {
+			break
+		}
+
+		if err != nil {
+			log.Fatalf("Nao foi possivel receber os dados a requisicao grpc: %v", err)
+		}
+
+		fmt.Println("Status: ", stream.Status)
+	}
 }
